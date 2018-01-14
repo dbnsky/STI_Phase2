@@ -3,12 +3,8 @@
 
 	include_once 'connectionBDD.php';
 	include_once 'utils.php';
-
-	/* Si utilisateur pas auth => redirection */
-	if (!isset($_SESSION['id'])) {
-		header ('Location: index.php');
-		exit();
-	}
+	include_once 'sessionManager.php';
+	require 'password.php';
 
 	/* Verification si user admin */
 	$currentUser = getUser($_SESSION['id'],$bddcon);
@@ -16,21 +12,57 @@
 		header ('Location: index.php');
 		exit();
 	}
-	
-	/* Si username et password fournit */
-	if (isset($_POST['username'],$_POST['password'])){
-		
-		$username = $_POST['username'];
-		$password = $_POST['password'];
-		$role = $_POST['role'];
-		$activation = $_POST['activation'];
-		
-		/* Recherche user dans le bdd : Si rien trouvé alors création */
-		$user = existingUser($username, $bddcon);
-		if($user == '' && $username != '' && $password != ''){
-			newUser($username, $password, $role, $activation, $bddcon);
-			header('Location: usersManager.php');
-		}	
+
+	generateHashTokenForm('signin.php');
+
+	if($_SERVER["REQUEST_METHOD"] == "POST"){
+		$urlPage = "http://localhost/signin.php";
+		$checkUrl = $_SERVER['HTTP_REFERER'];
+		/* Validitée du token et verif de l'origine */
+		if($urlPage != $checkUrl && $_SESSION['CSRFToken'] != $_POST['tokenForm']){
+			header ('Location: usersManager.php');
+			exit();
+		}
+
+		// Si username et password fournit
+		if (isset($_POST['username'],$_POST['password'])){
+			//Clear input to avoid XSS attack
+			$username = inputCleanXSS($_POST['username']);
+			$password = inputCleanXSS($_POST['password']);
+
+			if(empty($password) && empty($username)){
+				header ('Location: index.php');
+				exit();
+			}
+
+			if(passwordPolicy($password)){
+
+				$passwordHash = password_hash($_POST['password'],PASSWORD_BCRYPT);
+
+				if(isset($_POST['role'])){
+					$role = 1;
+				} else {
+					$role = 0;
+				}
+
+				if(isset($_POST['activation'])){
+					$activation = 1;
+				} else {
+					$activation = 0;
+				}
+
+				// Recherche user dans le bdd : Si rien trouvé alors création 
+				$user = existingUser($username, $bddcon);
+				if(empty($user)){
+					newUser($username, $passwordHash, $role, $activation, $bddcon);
+					header('Location: usersManager.php');
+				}
+			} else {
+				echo "Password pas conforme à la politique de mdp";
+			}
+		} else {
+			echo "Fournir au minimum un username et un password";
+		}
 	}
 ?>
 
@@ -43,8 +75,9 @@
 		<form action="signin.php" method="post">
 			Login : <input type="text" name="username" placeholder="Enter Username"/><br />
 			Password : <input type="password" name="password"/><br />
-			Role : <input type="number" name="role" placeholder="1:admin 0:user"/><br />
-			Activation : <input type="number" name="activation" placeholder="1:active 0:disable"/><br />
+			Role : <input type='CheckBox' name='role' value='Admin'><br />
+			Activation : <input type='CheckBox' name='activation' value='Active'><br />
+			<input type="hidden" name="tokenForm" value="<?php echo $_SESSION['CSRFToken']; ?>" />
 			<input type="submit" name="sigin" value="signin">
 		</form>
 	</body>

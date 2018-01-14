@@ -3,11 +3,6 @@
 Creation de la base de donnees et ouverture
 de la connexion
 #########################################*/
-
-
-echo "test";
-
-
  
   // Set default timezone
   date_default_timezone_set('UTC');
@@ -51,7 +46,7 @@ CREATE TABLE IF NOT EXISTS utilisateurs(
 
                     id INTEGER PRIMARY KEY,
                     nomUtilisateur TEXT,
-                    motDePasse TEXT, 
+                    motDePasse CHAR(60), 
                     role TEXT,
                     activation INTEGER, 
                     CONSTRAINT nomUtilisateur_unique UNIQUE(nomUtilisateur)
@@ -88,18 +83,18 @@ echo "la table des utilisateurs a ete cree\n";
 
 
  $utilisateurs = array(
-                  array('nomUtilisateur' => 'silver',
-                        'motDePasse' => 'silver' ,
+                  array('nomUtilisateur' => 'admin',
+                        'motDePasse' => '$2y$10$8QwXfiwEPfm8zHmDpymaEeEBsaN/w6NoZkBPh3YF3fkR7PseCph46' ,
                         'role' => '1' ,
                         'activation' => '1'),
                         
-                  array('nomUtilisateur' => 'emmanuel',
-                        'motDePasse' => 'emmanuel' ,
+                  array('nomUtilisateur' => 'user1',
+                        'motDePasse' => '$2y$10$1MZNIHRA3V4wzt.l2qCuZelii5kMX/lifsM3fUE17kz3L7iPwZNKO' ,
                         'role' => '0' ,
                         'activation' => '1'),
 
-                  array('nomUtilisateur' => 'toto',
-                        'motDePasse' => 'toto' ,
+                  array('nomUtilisateur' => 'user2',
+                        'motDePasse' => '$2y$10$ndtpbmQgn7TlbbNW4bZ.JeGrvYhpnck8sgZu3SyJTPZwbBetLLiw6' ,
                         'role' => '0' ,
                         'activation' => '0'),
                 );

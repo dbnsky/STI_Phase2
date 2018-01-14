@@ -1,12 +1,32 @@
 <?php
+	session_start();
 	include_once 'connectionBDD.php';
 	include_once 'utils.php';
-	session_start();
+	include_once 'sessionManager.php';
+	require 'authentification.php';	
+	
+	generateHashTokenForm('inbox.php');
+	
+	/* Envoie formulaire */
+	if($_SERVER["REQUEST_METHOD"] == "POST"){
+		$urlPage = "http://localhost/inbox.php";
+		$checkUrl = $_SERVER['HTTP_REFERER'];
+		/* Validitée du token et verif de l'origine */
+		if($urlPage != $checkUrl && $_SESSION['CSRFToken'] != $_POST['tokenForm']){
+			header ('Location: index.php');
+			exit();
+		}
+		if (isset($_POST['idMsgDel'])){
+			$idMessageToDel = inputCleanXSS($_POST['idMsgDel']);
+			if(!empty($idMessageToDel) && intval($idMessageToDel)){
 
-	/* Si utilisateur pas auth => redirection */
-	if (!isset($_SESSION['id'])) {
-		header ('Location: index.php');
-		exit();
+				$messageToDel = getMessage($idMessageToDel,$bddcon);
+				if(!empty($messageToDel) && $_SESSION['id'] == $messageToDel['destinataire']){
+				// Suppression message
+				deleteMessage($idMessageToDel, $bddcon);
+				}
+			}
+		}
 	}
 ?>
 
@@ -18,10 +38,8 @@
 	<body>
 		<h1> Inbox </h1>
 		<?php
-			/* L'id du user se trouve dans la session une fois auth */
-			$idCurrentUser = $_SESSION['id'];
-		
-			$messages = getMessages($idCurrentUser, $bddcon);
+			/* Récupère la liste des messages du user auth */
+			$messages = getMessages($_SESSION['id'], $bddcon);
 			/* Affichages des messages si il y en a */
 			if(!empty($messages))
 			{
@@ -47,9 +65,13 @@
 					echo '<td>' . $expediteurUser['nomUtilisateur'] . '</td>';
 					echo '<td>' . $sujet . '</td>';
 					echo '<td>' . $date . '</td>';
-					echo '<td> <a href="consultMessage.php?destinataire=', $msg['destinataire'],'&idMessage=', $msg['id'],'"> Lire </a> </td>';
-					echo '<td> <a href="writeMessage.php?destinataire=',$msg['expediteur'],'"> Répondre </a> </td>';
-					echo '<td> <a href="delMessage.php?id=', $msg['id'], '"> Supprimer </a> </td>';
+					echo '<td> <a href="consultMessage.php?idMessage=', $msg['id'],'"> Lire </a> </td>';
+					echo '<td> <a href="writeMessage.php?idMessage=',$msg['id'],'"> Répondre </a> </td>';
+					echo '<td><form action="inbox.php" method="post">';
+					echo '<input type="submit" value="Supprimer" onclick="return confirm(\'Confirmation?\');">';
+					echo '<input type="hidden" name="idMsgDel" value=',$msg['id'],'>';
+					echo '<input type="hidden" name="tokenForm" value=',$_SESSION['CSRFToken'].'/>';
+					echo '</form></td>';
 					echo '</tr>';
 				}
 			echo '</table>';
@@ -61,14 +83,14 @@
 			</li>
 		<?php
 		/* Menu en fonction du role */
-			$currentUser = getUser($idCurrentUser,$bddcon);
+			$currentUser = getUser($_SESSION['id'],$bddcon);
 			if ($currentUser['role'] == 1) {
 				echo '<li>';
 				echo '<a href="usersManager.php"> List membre </a>';
 				echo '</li>';
 			}
 			echo '<li>';
-			echo '<a href="changePassword.php?id=', $idCurrentUser, '">Changer mot de passe </a>';
+			echo '<a href="changePassword.php">Changer mot de passe </a>';
 			echo '</li>';
 			echo '<li>';
 			echo '<a href="logout.php">Déconnexion</a>';

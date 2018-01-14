@@ -1,5 +1,8 @@
 
 <?php
+	function inputCleanXSS($inputToClean){
+		return htmlentities($inputToClean, ENT_COMPAT | ENT_HTML401, 'UTF-8');
+	}
 	/* Retourne un message en fonction d'un id */
 	function getMessage($id, $bddcon)
 	{
@@ -61,6 +64,16 @@
 	$bddcon->query($query);
 	}
 
+	/* Validation du password selon la politique */
+	function passwordPolicy($password){
+	
+		if (preg_match('#^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W).{6,15}$#',$password)){
+			return true;
+    		} else {
+			return false;
+		}	
+	}
+
 	/* Verfie l'existence d'un user */
 	function existingUser($username, $bddcon){
 		$query = "SELECT * FROM utilisateurs WHERE nomUtilisateur='$username'";
@@ -71,7 +84,7 @@
 
 	/* Création user */
 	function newUser($username, $password, $role, $activation, $bddcon){
-		$query = "INSERT INTO utilisateurs (nomUtilisateur, motDePasse, role, activation) VALUES (' $username', '$password', $role, $activation);";
+		$query = "INSERT INTO utilisateurs (nomUtilisateur, motDePasse, role, activation) VALUES ('$username', '$password', $role, $activation);";
 		$bddcon->query($query);
 	}
 
