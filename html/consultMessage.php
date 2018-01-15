@@ -28,7 +28,7 @@
 		}
 	}
 
-	/* Verfication des paramètres */
+	/* Verification des paramètres */
 	if(!isset($_GET['idMessage'])){
 		header ('Location: inbox.php');
 		exit();

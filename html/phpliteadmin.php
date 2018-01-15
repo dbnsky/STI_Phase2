@@ -56,7 +56,8 @@ $subdirectories = false;
 //if any of the databases do not exist as they are referenced by their path, they will be created automatically
 $databases = array(
 	array(
-		'path'=> '/var/www/databases/database.sqlite',
+		//'path'=> '/var/www/database/database.sqlite',		
+		'path'=> '/var/www/STI_Phase2/databases/database.sqlite',
 		'name'=> 'Database 1'
 	),
 );

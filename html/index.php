@@ -10,7 +10,7 @@
 		header('Location: inbox.php');
 		exit();
 	}
-
+	
 	generateHashTokenForm('index.php');
 
 	if($_SERVER["REQUEST_METHOD"] == "POST"){

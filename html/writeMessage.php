@@ -18,7 +18,7 @@
 				header ('Location: inbox.php');
 				exit();
 			} else {
-				$destinataireMessage = getUser($message['destinataire'],$bddcon);
+				$destinataireMessage = getUser($message['expediteur'],$bddcon);
 				$sujetMessage = $message['sujet'];
 			}
 		} else {
@@ -33,7 +33,7 @@
 	/* Envoie formulaire */
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 
-		/* Contrôle : Présance des champs du formulaire */
+		/* Contrôle : Présence des champs du formulaire */
 		if (isset($_POST['sujet'], $_POST['destinataire'], $_POST['message']))
 		{
 			$urlPage = "http://localhost/writeMessage.php";
@@ -47,13 +47,15 @@
 				$message = inputCleanXSS($_POST['message']);
 				
 				$expediteurId = $_SESSION['id'];
-				$desinataireUser = existingUser($destinataire, $bddcon);
+				$destinataireUser = existingUser($destinataire, $bddcon);
 				// Contrôle : destinataire trouvé
-				if (empty($desinataireUser)){
+				if (empty($destinataireUser)){
 					echo 'Destinataire pas trouvé !';			
 				} else {
+					echo "Im HERERRRR";
+					echo $destinataireUser['id'];
 					/* Création d'un msg */		
-					newMessage($expediteurId,$desinataireUser['id'], $sujet, $message, $bddcon);
+					newMessage($expediteurId,$destinataireUser['id'], $sujet, $message, $bddcon);
 					header ('Location: inbox.php');
 					exit();
 				}

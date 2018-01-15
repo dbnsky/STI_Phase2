@@ -10,7 +10,8 @@ de la connexion
   try {
  
     // Create (connect to) SQLite database in file
-    $file_db = new PDO('sqlite:/var/www/databases/database.sqlite');
+    //$file_db = new PDO('sqlite:/var/www/databases/database.sqlite');
+    $file_db = new PDO('sqlite:/var/www/STI_Phase2/databases/database.sqlite');
     // Set errormode to exceptions
     $file_db->setAttribute(PDO::ATTR_ERRMODE, 
                             PDO::ERRMODE_EXCEPTION); 
@@ -30,7 +31,7 @@ CREATE TABLE IF NOT EXISTS messages(
                     destinataire INTEGER NOT NULL,
                     sujet TEXT,
                     message TEXT,
-                    dateEnvoi TEXT,  
+                    dateEnvoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
                     FOREIGN KEY(expediteur) REFERENCES utilisateurs(id),
                     FOREIGN KEY(destinataire) REFERENCES utilisateurs(id)
 

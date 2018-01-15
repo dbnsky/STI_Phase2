@@ -41,6 +41,7 @@
 			/* Récupère la liste des messages du user auth */
 			$messages = getMessages($_SESSION['id'], $bddcon);
 			/* Affichages des messages si il y en a */
+
 			if(!empty($messages))
 			{
 			/* Création de l'en-tête du tableau */
@@ -59,6 +60,7 @@
 				{
 					$idExpediteur = $msg['expediteur'];
 					$expediteurUser = getUser($idExpediteur, $bddcon);
+					
 					$date = $msg['dateEnvoi'];
 					$sujet = $msg['sujet'];
 					echo '<tr>';
