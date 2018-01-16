@@ -32,7 +32,8 @@
 
 	/* Création msg */
 	function newMessage( $expediteurId,$destinataireUserId, $sujet, $message, $bddcon){
-		$stmt = "INSERT INTO messages (expediteur, destinataire, sujet, message) VALUES 			(:expediteurId, :destinataireUserId, :sujet, :message);";
+		$stmt = "INSERT INTO messages (expediteur, destinataire, sujet, message) 
+		VALUES (:expediteurId, :destinataireUserId, :sujet, :message);";
 		$res = $bddcon->prepare($stmt, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$res->execute(array(':expediteurId'      => htmlspecialchars($expediteurId),
 				    ':destinataireUserId'=> htmlspecialchars($destinataireUserId), 

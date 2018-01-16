@@ -10,8 +10,8 @@ de la connexion
   try {
  
     // Create (connect to) SQLite database in file
-    //$file_db = new PDO('sqlite:/var/www/databases/database.sqlite');
-    $file_db = new PDO('sqlite:/var/www/STI_Phase2/databases/database.sqlite');
+    $file_db = new PDO('sqlite:/var/www/databases/database.sqlite');
+    //$file_db = new PDO('sqlite:/var/www/STI_Phase2/databases/database.sqlite');
     // Set errormode to exceptions
     $file_db->setAttribute(PDO::ATTR_ERRMODE, 
                             PDO::ERRMODE_EXCEPTION); 
